@@ -7,7 +7,9 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
 
-import logisticspipes.utils.ItemIdentifier;
+import logisticspipes.proxy.SimpleServiceLocator;
+import logisticspipes.proxy.factorization.FactorizationProxy;
+import logisticspipes.utils.item.ItemIdentifier;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -37,10 +39,10 @@ public class BarrelInventoryHandler extends SpecialInventoryHandler {
 	@Override
 	public boolean init() {
 		try {
-			barrelClass = Class.forName("factorization.common.TileEntityBarrel");
-			getItemCount = barrelClass.getDeclaredMethod("getItemCount", new Class[]{});
-			setItemCount = barrelClass.getDeclaredMethod("setItemCount", new Class[]{int.class});
-			getMaxSize = barrelClass.getDeclaredMethod("getMaxSize", new Class[]{});
+			barrelClass = Class.forName(FactorizationProxy.barelClassPath);
+			getItemCount = barrelClass.getDeclaredMethod("getItemCount", new Class[]{}); // ()I
+			setItemCount = barrelClass.getDeclaredMethod("setItemCount", new Class[]{int.class}); // (I)V
+			getMaxSize = barrelClass.getDeclaredMethod("getMaxSize", new Class[]{}); // ()I
 			item = barrelClass.getDeclaredField("item");
 			return true;
 		} catch(Exception e) {
@@ -50,7 +52,7 @@ public class BarrelInventoryHandler extends SpecialInventoryHandler {
 
 	@Override
 	public boolean isType(TileEntity tile) {
-		return barrelClass.isAssignableFrom(tile.getClass());
+		return SimpleServiceLocator.factorizationProxy.isBarral(tile);
 	}
 
 	@Override

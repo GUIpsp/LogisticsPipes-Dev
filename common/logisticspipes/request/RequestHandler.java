@@ -20,8 +20,8 @@ import logisticspipes.proxy.MainProxy;
 import logisticspipes.proxy.SimpleServiceLocator;
 import logisticspipes.request.RequestTree.ActiveRequestType;
 import logisticspipes.utils.FluidIdentifier;
-import logisticspipes.utils.ItemIdentifier;
-import logisticspipes.utils.ItemIdentifierStack;
+import logisticspipes.utils.item.ItemIdentifier;
+import logisticspipes.utils.item.ItemIdentifierStack;
 import logisticspipes.utils.tuples.Pair;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -42,7 +42,7 @@ public class RequestHandler {
 			player.sendChatToPlayer(ChatMessageComponent.createFromText("No Energy"));
 			return;
 		}
-		RequestTree.request(ItemIdentifier.get(stack.getItem().itemID, stack.getItem().itemDamage, stack.getItem().tag).makeStack(stack.stackSize), pipe
+		RequestTree.request(ItemIdentifier.get(stack.getItem().itemID, stack.getItem().itemDamage, stack.getItem().tag).makeStack(stack.getStackSize()), pipe
 				, new RequestLog() {
 			@Override
 			public void handleMissingItems(Map<ItemIdentifier,Integer> items) {
@@ -68,7 +68,7 @@ public class RequestHandler {
 	public static void simulate(final EntityPlayer player, final ItemIdentifierStack stack, CoreRoutedPipe pipe) {
 		final Map<ItemIdentifier,Integer> used = new HashMap<ItemIdentifier,Integer>();
 		final Map<ItemIdentifier,Integer> missing = new HashMap<ItemIdentifier,Integer>();
-		RequestTree.simulate(ItemIdentifier.get(stack.getItem().itemID, stack.getItem().itemDamage, stack.getItem().tag).makeStack(stack.stackSize), pipe, new RequestLog() {
+		RequestTree.simulate(ItemIdentifier.get(stack.getItem().itemID, stack.getItem().itemDamage, stack.getItem().tag).makeStack(stack.getStackSize()), pipe, new RequestLog() {
 			@Override
 			public void handleMissingItems(Map<ItemIdentifier,Integer> items) {
 				for(Entry<ItemIdentifier,Integer>e:items.entrySet()) {
@@ -130,7 +130,6 @@ public class RequestHandler {
 			if (_availableItems.containsKey(item)) continue;
 			_allItems.add(item.makeStack(0));
 		}
-//TODO	MainProxy.sendPacketToPlayer(new PacketRequestGuiContent(NetworkConstants.ORDERER_CONTENT_ANSWER, _allItems).getPacket(), (Player)player);
 		MainProxy.sendPacketToPlayer(PacketHandler.getPacket(OrdererContent.class).setIdentSet(_allItems), (Player)player);
 	}
 	
@@ -243,7 +242,6 @@ public class RequestHandler {
 
 	public static void refreshFluid(EntityPlayer player, CoreRoutedPipe pipe) {
 		TreeSet<ItemIdentifierStack> _allItems = SimpleServiceLocator.logisticsFluidManager.getAvailableFluid(pipe.getRouter().getIRoutersByCost());
-//TODO 	MainProxy.sendPacketToPlayer(new PacketRequestGuiContent(NetworkConstants.ORDERER_CONTENT_ANSWER, _allItems).getPacket(), (Player)player);
 		MainProxy.sendPacketToPlayer(PacketHandler.getPacket(OrdererContent.class).setIdentSet(_allItems), (Player)player);
 	}
 
@@ -253,7 +251,7 @@ public class RequestHandler {
 			return;
 		}
 		
-		RequestTree.requestFluid(FluidIdentifier.get(stack.getItem()) , stack.stackSize, requester, new RequestLog() {
+		RequestTree.requestFluid(FluidIdentifier.get(stack.getItem()) , stack.getStackSize(), requester, new RequestLog() {
 			@Override
 			public void handleMissingItems(Map<ItemIdentifier,Integer> items) {
 				Collection<ItemIdentifierStack> coll = new ArrayList<ItemIdentifierStack>(items.size());

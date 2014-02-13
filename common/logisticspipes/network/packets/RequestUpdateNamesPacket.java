@@ -11,7 +11,7 @@ import logisticspipes.network.PacketHandler;
 import logisticspipes.network.abstractpackets.ModernPacket;
 import logisticspipes.proxy.MainProxy;
 import logisticspipes.proxy.SimpleServiceLocator;
-import logisticspipes.utils.ItemIdentifier;
+import logisticspipes.utils.item.ItemIdentifier;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -48,7 +48,6 @@ public class RequestUpdateNamesPacket extends ModernPacket {
 		}
 		SimpleServiceLocator.clientBufferHandler.setPause(true);
 		for(ItemIdentifier item:identList) {
-//TODO 		MainProxy.sendCompressedPacketToServer((Packet250CustomPayload) new PacketNameUpdatePacket(NetworkConstants.UPDATE_NAMES, item).getPacket());
 			MainProxy.sendPacketToServer(PacketHandler.getPacket(UpdateName.class).setIdent(item).setName(item.getFriendlyName()));
 		}
 		SimpleServiceLocator.clientBufferHandler.setPause(false);

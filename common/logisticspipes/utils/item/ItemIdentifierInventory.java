@@ -6,7 +6,7 @@
  * http://www.mod-buildcraft.com/MMPL-1.0.txt
  */
 
-package logisticspipes.utils;
+package logisticspipes.utils.item;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,6 +17,8 @@ import java.util.Map;
 import logisticspipes.LogisticsPipes;
 import logisticspipes.interfaces.routing.ISaveState;
 import logisticspipes.proxy.MainProxy;
+import logisticspipes.utils.FluidIdentifier;
+import logisticspipes.utils.ISimpleInventoryEventHandler;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -25,7 +27,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.World;
 
-public class SimpleInventory implements IInventory, ISaveState{
+public class ItemIdentifierInventory implements IInventory, ISaveState {
 
 	private ItemIdentifierStack[] _contents;
 	private final String _name;
@@ -36,7 +38,7 @@ public class SimpleInventory implements IInventory, ISaveState{
 	
 	private final LinkedList<ISimpleInventoryEventHandler> _listener = new LinkedList<ISimpleInventoryEventHandler>(); 
 
-	public SimpleInventory(int size, String name, int stackLimit, boolean liquidInv) {
+	public ItemIdentifierInventory(int size, String name, int stackLimit, boolean liquidInv) {
 		_contents = new ItemIdentifierStack[size];
 		_name = name;
 		_stackLimit = stackLimit;
@@ -45,7 +47,7 @@ public class SimpleInventory implements IInventory, ISaveState{
 		isLiquidInvnetory = liquidInv;
 	}
 
-	public SimpleInventory(int size, String name, int stackLimit) {
+	public ItemIdentifierInventory(int size, String name, int stackLimit) {
 		this(size, name, stackLimit, false);
 	}
 	
@@ -69,10 +71,10 @@ public class SimpleInventory implements IInventory, ISaveState{
 	@Override
 	public ItemStack decrStackSize(int slot, int count) {
 		if (_contents[slot] == null) return null;
-		if (_contents[slot].stackSize > count) {
+		if (_contents[slot].getStackSize() > count) {
 			ItemStack ret = _contents[slot].makeNormalStack();
 			ret.stackSize=count;
-			_contents[slot].stackSize-=count;
+			_contents[slot].setStackSize(_contents[slot].getStackSize() - count);
 			updateContents();
 			return ret;
 		}
@@ -85,10 +87,10 @@ public class SimpleInventory implements IInventory, ISaveState{
 	// here so the returned stack can be stuck in another inventory without re-converting it/
 	public ItemIdentifierStack decrIDStackSize(int slot, int count) {
 		if (_contents[slot] == null) return null;
-		if (_contents[slot].stackSize > count) {
+		if (_contents[slot].getStackSize() > count) {
 			ItemIdentifierStack ret = _contents[slot].clone();
-			ret.stackSize=count;
-			_contents[slot].stackSize-=count;
+			ret.setStackSize(count);
+			_contents[slot].setStackSize(_contents[slot].getStackSize() - count);
 			updateContents();
 			return ret;
 		}
@@ -196,7 +198,7 @@ public class SimpleInventory implements IInventory, ISaveState{
 	public void writeToNBT(NBTTagCompound nbttagcompound, String prefix) {
 		NBTTagList nbttaglist = new NBTTagList();
     	for (int j = 0; j < _contents.length; ++j) {    		    		
-    		if (_contents[j] != null && _contents[j].stackSize > 0) {
+    		if (_contents[j] != null && _contents[j].getStackSize() > 0) {
         		NBTTagCompound nbttagcompound2 = new NBTTagCompound ();
         		nbttaglist.appendTag(nbttagcompound2);
     			nbttagcompound2.setInteger("index", j);
@@ -273,16 +275,16 @@ public class SimpleInventory implements IInventory, ISaveState{
 		ItemIdentifierStack slot = _contents[i];
 		if(slot == null) {
 			_contents[i] = ItemIdentifierStack.getFromStack(stack);
-			_contents[i].stackSize = Math.min(_contents[i].stackSize, realstacklimit);
-			return _contents[i].stackSize;
+			_contents[i].setStackSize(Math.min(_contents[i].getStackSize(), realstacklimit));
+			return _contents[i].getStackSize();
 		}
 		ItemIdentifier stackIdent = ItemIdentifier.get(stack);
 		ItemIdentifier slotIdent = slot.getItem();
 		if(slotIdent.equals(stackIdent)) {
-			slot.stackSize += stack.stackSize;
-			if(slot.stackSize > realstacklimit) {
-				int ans = stack.stackSize - (slot.stackSize - realstacklimit);
-				slot.stackSize = realstacklimit;
+			slot.setStackSize(slot.getStackSize() + stack.stackSize);
+			if(slot.getStackSize() > realstacklimit) {
+				int ans = stack.stackSize - (slot.getStackSize() - realstacklimit);
+				slot.setStackSize(realstacklimit);
 				return ans;
 			} else {
 				return stack.stackSize;
@@ -336,9 +338,9 @@ public class SimpleInventory implements IInventory, ISaveState{
 			ItemIdentifier itemId = _contents[i].getItem();
 			Integer count = _contentsMap.get(itemId);
 			if (count == null) {
-				_contentsMap.put(itemId,  _contents[i].stackSize);
+				_contentsMap.put(itemId,  _contents[i].getStackSize());
 			} else {
-				_contentsMap.put(itemId, _contentsMap.get(itemId) +  _contents[i].stackSize);
+				_contentsMap.put(itemId, _contentsMap.get(itemId) +  _contents[i].getStackSize());
 			}
 			_contentsUndamagedSet.add(itemId.getUndamaged()); // add is cheaper than check then add; it just returns false if it is already there
 		}
@@ -399,7 +401,7 @@ public class SimpleInventory implements IInventory, ISaveState{
 					continue;
 				}
 				if (itemInSlot == stackInOtherSlot.getItem()) {
-					stackInSlot.stackSize += stackInOtherSlot.stackSize;
+					stackInSlot.setStackSize(stackInSlot.getStackSize() + stackInOtherSlot.getStackSize());
 					clearInventorySlotContents(j);
 				}
 			}

@@ -5,11 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 
 import logisticspipes.pipes.PipeItemsCraftingLogistics;
+import logisticspipes.proxy.SimpleServiceLocator;
 import logisticspipes.pipes.basic.CoreRoutedPipe;
 import logisticspipes.pipes.basic.LogisticsTileGenericPipe;
 import logisticspipes.pipes.basic.fluid.FluidRoutedPipe;
 import logisticspipes.transport.PipeFluidTransportLogistics;
-import logisticspipes.utils.ItemIdentifierStack;
+import logisticspipes.utils.item.ItemIdentifierStack;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -196,7 +197,7 @@ public class LogisticsRenderPipe extends TileEntitySpecialRenderer {
         
         GL11.glTranslatef(0.0F, -0.3125F, -0.31F);
         GL11.glRotatef(180, 0.0f, 1.0f, 0.0f);
-        this.modelSign.signStick.showModel = false;
+        SimpleServiceLocator.betterSignProxy.hideSignSticks(this.modelSign);
 		Minecraft.getMinecraft().renderEngine.bindTexture(SIGN);
 
         GL11.glPushMatrix();

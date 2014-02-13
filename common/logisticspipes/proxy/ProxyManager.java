@@ -6,13 +6,17 @@ import java.util.List;
 import logisticspipes.LogisticsPipes;
 import logisticspipes.interfaces.IHUDConfig;
 import logisticspipes.pipes.basic.LogisticsTileGenericPipe;
+import logisticspipes.proxy.bettersign.BetterSignProxy;
 import logisticspipes.proxy.bs.BetterStorageProxy;
 import logisticspipes.proxy.cc.CCProxy;
 import logisticspipes.proxy.cc.CCTurtleProxy;
+import logisticspipes.proxy.factorization.FactorizationProxy;
 import logisticspipes.proxy.forestry.ForestryProxy;
 import logisticspipes.proxy.ic2.IC2Proxy;
+import logisticspipes.proxy.interfaces.IBetterSignProxy;
 import logisticspipes.proxy.interfaces.IBetterStorageProxy;
 import logisticspipes.proxy.interfaces.ICCProxy;
+import logisticspipes.proxy.interfaces.IFactorizationProxy;
 import logisticspipes.proxy.interfaces.IForestryProxy;
 import logisticspipes.proxy.interfaces.IIC2Proxy;
 import logisticspipes.proxy.interfaces.IModularPowersuitsProxy;
@@ -23,9 +27,10 @@ import logisticspipes.proxy.mps.ModularPowersuitsProxy;
 import logisticspipes.proxy.nei.NEIProxy;
 import logisticspipes.proxy.te.ThermalExpansionProxy;
 import logisticspipes.proxy.thaumcraft.ThaumCraftProxy;
-import logisticspipes.utils.ItemIdentifier;
+import logisticspipes.utils.item.ItemIdentifier;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.model.ModelSign;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -145,7 +150,7 @@ public class ProxyManager {
 			LogisticsPipes.log.info("Loaded ThermalExpansion DummyProxy");
 		}
 		
-		if(Loader.isModLoaded("BetterStorage")) {
+		if(Loader.isModLoaded("betterstorage")) {
 			SimpleServiceLocator.setBetterStorageProxy(new BetterStorageProxy());
 			LogisticsPipes.log.info("Loaded BetterStorage Proxy");
 		} else {
@@ -166,8 +171,8 @@ public class ProxyManager {
 			});
 			LogisticsPipes.log.info("Loaded NotEnoughItems DummyProxy");
 		}
-		
-		if(Loader.isModLoaded("mmmPowersuits")) {
+
+		if(Loader.isModLoaded("powersuits")) {
 			SimpleServiceLocator.setMPSProxy(new ModularPowersuitsProxy());
 			LogisticsPipes.log.info("Loaded Modular Powersuits Proxy");
 		} else {
@@ -196,5 +201,28 @@ public class ProxyManager {
 			});
 			LogisticsPipes.log.info("Loaded Modular Powersuits DummyProxy");
 		}
+		
+		if(Loader.isModLoaded("factorization")) {
+			SimpleServiceLocator.setFactorizationProxy(new FactorizationProxy());
+			LogisticsPipes.log.info("Loaded Factorization Proxy");
+		} else {
+			SimpleServiceLocator.setFactorizationProxy(new IFactorizationProxy() {
+				@Override public boolean isBarral(TileEntity tile) {return false;}
+			});
+			LogisticsPipes.log.info("Loaded Factorization DummyProxy");
+		}
+		
+		if(Loader.isModLoaded("BetterSignsMod") && MainProxy.isClient()) {
+			SimpleServiceLocator.setBetterSignProxy(new BetterSignProxy());
+			LogisticsPipes.log.info("Loaded BetterSign Proxy");
+		} else {
+			SimpleServiceLocator.setBetterSignProxy(new IBetterSignProxy() {
+				@Override public void hideSignSticks(ModelSign model) {
+					model.signStick.showModel = false;
+				}
+			});
+			LogisticsPipes.log.info("Loaded BetterSign DummyProxy");
+		}
+		
 	}
 }

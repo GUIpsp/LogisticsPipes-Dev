@@ -1,7 +1,7 @@
 package logisticspipes.proxy.recipeproviders;
 
 import logisticspipes.proxy.interfaces.ICraftingRecipeProvider;
-import logisticspipes.utils.SimpleInventory;
+import logisticspipes.utils.item.ItemIdentifierInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import buildcraft.api.recipes.AssemblyRecipe;
@@ -14,7 +14,7 @@ public class AssemblyTable implements ICraftingRecipeProvider {
 	}
 
 	@Override
-	public boolean importRecipe(TileEntity tile, SimpleInventory inventory) {
+	public boolean importRecipe(TileEntity tile, ItemIdentifierInventory inventory) {
 		if (!(tile instanceof TileAssemblyTable))
 			return false;
 
@@ -53,14 +53,19 @@ public class AssemblyTable implements ICraftingRecipeProvider {
 
 		// Import
 		inventory.setInventorySlotContents(inventory.getSizeInventory() - 2, nextRecipe.output);
-		for (int i = 0; i < inventory.getSizeInventory() - 2; i++) {
-			if(i < nextRecipe.input.length) {
-				inventory.setInventorySlotContents(i, nextRecipe.input[i]);
-			} else {
-				inventory.clearInventorySlotContents(i);
+		try {
+			for (int i = 0; i < inventory.getSizeInventory() - 2; i++) {
+				if (i < nextRecipe.input.length) {
+					inventory.setInventorySlotContents(i,
+							(ItemStack) nextRecipe.input[i]);
+				} else {
+					inventory.clearInventorySlotContents(i);
+				}
 			}
-		}
+		} catch (ClassCastException e) {// TODO: make it show a nice error or
+										// remove this hack altogether.
 
+		}
 		// Compact
 		inventory.compact_first_9();
 		

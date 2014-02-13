@@ -7,13 +7,13 @@ import logisticspipes.gui.orderer.NormalMk2GuiOrderer;
 import logisticspipes.network.PacketHandler;
 import logisticspipes.network.packets.orderer.DiscContent;
 import logisticspipes.proxy.MainProxy;
-import logisticspipes.utils.ItemIdentifier;
-import logisticspipes.utils.ItemIdentifierStack;
 import logisticspipes.utils.gui.BasicGuiHelper;
 import logisticspipes.utils.gui.IItemSearch;
 import logisticspipes.utils.gui.KraphtBaseGuiScreen.Colors;
 import logisticspipes.utils.gui.SmallGuiButton;
 import logisticspipes.utils.gui.SubGuiScreen;
+import logisticspipes.utils.item.ItemIdentifier;
+import logisticspipes.utils.item.ItemIdentifierStack;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -142,7 +142,7 @@ public class GuiAddMacro extends SubGuiScreen implements IItemSearch {
 		
 		fontRenderer.drawString("Add Macro", guiLeft + fontRenderer.getStringWidth("Add Macro") / 2, guiTop + 6, 0x404040);
 		
-		maxPageAll = (int) Math.floor((getSearchedItemNumber(mainGui._allItems) - 1)  / 45F);
+		maxPageAll = (int) Math.floor((getSearchedItemNumber(mainGui.itemDisplay._allItems) - 1)  / 45F);
 		if(maxPageAll == -1) maxPageAll = 0;
 		if (pageAll > maxPageAll){
 			pageAll = maxPageAll;
@@ -240,7 +240,7 @@ public class GuiAddMacro extends SubGuiScreen implements IItemSearch {
 		drawRect(guiLeft + 6, guiTop + 16, right - 12, bottom - 84, BasicGuiHelper.ConvertEnumToColor(Colors.MiddleGrey));
 		drawRect(guiLeft + 6, bottom - 52, right - 12, bottom - 32, BasicGuiHelper.ConvertEnumToColor(Colors.DarkGrey));
 		
-		for(ItemIdentifierStack itemStack : mainGui._allItems) {
+		for(ItemIdentifierStack itemStack : mainGui.itemDisplay._allItems) {
 			ItemIdentifier item = itemStack.getItem();
 			if(!itemSearched(item)) continue;
 			ppi++;
@@ -268,10 +268,10 @@ public class GuiAddMacro extends SubGuiScreen implements IItemSearch {
 						for(ItemIdentifierStack stack:macroItems) {
 							if(stack.getItem().equals(item)) {
 								if(mousebutton == 0 || wheelup != 0) {
-									stack.stackSize += 1 + (wheelup != 0 ? wheelup - 1: 0);
+									stack.setStackSize(stack.getStackSize() + (1 + (wheelup != 0 ? wheelup - 1: 0)));
 								} else if(mousebutton == 1 || wheeldown != 0) {
-									stack.stackSize -= 1 + (wheeldown != 0 ? wheeldown - 1: 0);
-									if(stack.stackSize <= 0) {
+									stack.setStackSize(stack.getStackSize() - (1 + (wheeldown != 0 ? wheeldown - 1: 0)));
+									if(stack.getStackSize() <= 0) {
 										macroItems.remove(stack);
 									}
 								}
@@ -322,7 +322,7 @@ public class GuiAddMacro extends SubGuiScreen implements IItemSearch {
 			}
 		}
 
-		BasicGuiHelper.renderItemIdentifierStackListIntoGui(mainGui._allItems, this, pageAll, guiLeft + 10, guiTop + 18, 9, 45, panelxSize, panelySize, mc, false, false);
+		BasicGuiHelper.renderItemIdentifierStackListIntoGui(mainGui.itemDisplay._allItems, this, pageAll, guiLeft + 10, guiTop + 18, 9, 45, panelxSize, panelySize, mc, false, false);
 
 		ppi = 0;
 		column = 0;
@@ -446,7 +446,7 @@ public class GuiAddMacro extends SubGuiScreen implements IItemSearch {
 					if(stack.getItem().tag != null) {
 						itemNBT.setCompoundTag("nbt", stack.getItem().tag);
 					}
-					itemNBT.setInteger("amount", stack.stackSize);
+					itemNBT.setInteger("amount", stack.getStackSize());
 					inventar.appendTag(itemNBT);
 				}
 
@@ -469,7 +469,6 @@ public class GuiAddMacro extends SubGuiScreen implements IItemSearch {
 					list.appendTag(nbt);
 				}
 				this.mainGui.getDisk().getTagCompound().setTag("macroList", list);
-//TODO 			MainProxy.sendPacketToServer(new PacketItem(NetworkConstants.DISK_CONTENT, mainGui.pipe.getX(), mainGui.pipe.getY(), mainGui.pipe.getZ(), mainGui.pipe.getDisk()).getPacket());
 				MainProxy.sendPacketToServer(PacketHandler.getPacket(DiscContent.class).setStack(mainGui.pipe.getDisk()).setPosX(mainGui.pipe.getX()).setPosY(mainGui.pipe.getY()).setPosZ(mainGui.pipe.getZ()));
 				this.exitGui();
 			} else if(macroItems.size() != 0) {

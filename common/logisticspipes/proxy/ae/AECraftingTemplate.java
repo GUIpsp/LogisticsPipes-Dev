@@ -8,8 +8,9 @@ import logisticspipes.request.CraftingTemplate;
 import logisticspipes.request.RequestTree;
 import logisticspipes.request.RequestTreeNode;
 import logisticspipes.routing.LogisticsPromise;
-import logisticspipes.utils.ItemIdentifier;
-import logisticspipes.utils.ItemIdentifierStack;
+import logisticspipes.utils.CraftingRequirement;
+import logisticspipes.utils.item.ItemIdentifier;
+import logisticspipes.utils.item.ItemIdentifierStack;
 import net.minecraft.item.ItemStack;
 import appeng.api.me.tiles.ITileInterfaceApi;
 import appeng.api.me.util.InterfaceCraftingResponse;
@@ -30,7 +31,7 @@ public class AECraftingTemplate extends CraftingTemplate {
 	}
 	
 	@Override
-	public void addRequirement(ItemIdentifierStack stack, IRequestItems crafter) {
+	public void addRequirement(CraftingRequirement stack, IRequestItems crafter) {
 	
 	}
 	

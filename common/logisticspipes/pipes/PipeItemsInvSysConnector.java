@@ -32,12 +32,12 @@ import logisticspipes.textures.Textures.TextureType;
 import logisticspipes.transport.TransportInvConnection;
 import logisticspipes.utils.AdjacentTile;
 import logisticspipes.utils.InventoryHelper;
-import logisticspipes.utils.ItemIdentifier;
-import logisticspipes.utils.ItemIdentifierStack;
 import logisticspipes.utils.PlayerCollectionList;
 import logisticspipes.utils.SidedInventoryMinecraftAdapter;
-import logisticspipes.utils.SimpleInventory;
 import logisticspipes.utils.WorldUtil;
+import logisticspipes.utils.item.ItemIdentifier;
+import logisticspipes.utils.item.ItemIdentifierInventory;
+import logisticspipes.utils.item.ItemIdentifierStack;
 import logisticspipes.utils.tuples.Quartet;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -56,7 +56,7 @@ public class PipeItemsInvSysConnector extends CoreRoutedPipe implements IDirectR
 	private boolean init = false;
 	//list of Itemdentifier, amount, destinationsimpleid, transportmode
 	private LinkedList<Quartet<ItemIdentifier,Integer,Integer,TransportMode>> destination = new LinkedList<Quartet<ItemIdentifier,Integer,Integer,TransportMode>>();
-	public SimpleInventory inv = new SimpleInventory(1, "Freq. card", 1);
+	public ItemIdentifierInventory inv = new ItemIdentifierInventory(1, "Freq. card", 1);
 	public int resistance;
 	public Set<ItemIdentifierStack> oldList = new TreeSet<ItemIdentifierStack>();
 	public final LinkedList<ItemIdentifierStack> displayList = new LinkedList<ItemIdentifierStack>();
@@ -195,7 +195,7 @@ public class PipeItemsInvSysConnector extends CoreRoutedPipe implements IDirectR
 			ItemIdentifierStack currentStack = new ItemIdentifierStack(pair.getValue1(), pair.getValue2());
 			Entry<ItemIdentifierStack,?> entry = list.ceilingEntry(currentStack);
 			if(entry!=null && entry.getKey().getItem().uniqueID == currentStack.getItem().uniqueID){
-				entry.getKey().stackSize += currentStack.stackSize;
+				entry.getKey().setStackSize(entry.getKey().getStackSize() + currentStack.getStackSize());
 			} else 
 				list.put(currentStack,null);
 		}
@@ -346,13 +346,11 @@ public class PipeItemsInvSysConnector extends CoreRoutedPipe implements IDirectR
 
 	@Override
 	public void startWatching() {
-//TODO 	MainProxy.sendPacketToServer(new PacketPipeInteger(NetworkConstants.HUD_START_WATCHING, getX(), getY(), getZ(), 1).getPacket());
 		MainProxy.sendPacketToServer(PacketHandler.getPacket(HUDStartWatchingPacket.class).setInteger(1).setPosX(getX()).setPosY(getY()).setPosZ(getZ()));
 	}
 
 	@Override
 	public void stopWatching() {
-//TODO 	MainProxy.sendPacketToServer(new PacketPipeInteger(NetworkConstants.HUD_STOP_WATCHING, getX(), getY(), getZ(), 1).getPacket());
 		MainProxy.sendPacketToServer(PacketHandler.getPacket(HUDStopWatchingPacket.class).setInteger(1).setPosX(getX()).setPosY(getY()).setPosZ(getZ()));
 	}
 
@@ -365,7 +363,6 @@ public class PipeItemsInvSysConnector extends CoreRoutedPipe implements IDirectR
 		Set<ItemIdentifierStack> newList = getExpectedItems();
 		if(!newList.equals(oldList)) {
 			oldList=newList;
-//TODO 		MainProxy.sendToPlayerList(new PacketPipeInvContent(NetworkConstants.ORDER_MANAGER_CONTENT, getX(), getY(), getZ(), newList).getPacket(), localModeWatchers);
 			MainProxy.sendToPlayerList(PacketHandler.getPacket(OrdererManagerContent.class).setIdentSet(newList).setPosX(getX()).setPosY(getY()).setPosZ(getZ()), localModeWatchers);
 		}
 	}
@@ -374,7 +371,6 @@ public class PipeItemsInvSysConnector extends CoreRoutedPipe implements IDirectR
 	public void playerStartWatching(EntityPlayer player, int mode) {
 		if(mode == 1) {
 			localModeWatchers.add(player);
-//TODO 		MainProxy.sendPacketToPlayer(new PacketPipeInvContent(NetworkConstants.ORDER_MANAGER_CONTENT, getX(), getY(), getZ(), getExpectedItems()).getPacket(), (Player)player);
 			MainProxy.sendPacketToPlayer(PacketHandler.getPacket(OrdererManagerContent.class).setIdentSet(getExpectedItems()).setPosX(getX()).setPosY(getY()).setPosZ(getZ()), (Player)player);
 		} else {
 			super.playerStartWatching(player, mode);

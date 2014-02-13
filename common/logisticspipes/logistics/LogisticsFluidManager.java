@@ -15,7 +15,7 @@ import logisticspipes.routing.ExitRoute;
 import logisticspipes.routing.IRouter;
 import logisticspipes.routing.PipeRoutingConnectionType;
 import logisticspipes.utils.FluidIdentifier;
-import logisticspipes.utils.ItemIdentifierStack;
+import logisticspipes.utils.item.ItemIdentifierStack;
 import logisticspipes.utils.tuples.Pair;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -78,7 +78,9 @@ public class LogisticsFluidManager implements ILogisticsFluidManager {
 				if (amount==null){
 					allAvailableItems.put(liquid.getKey(), liquid.getValue());
 				} else {
-					allAvailableItems.put(liquid.getKey(), amount + liquid.getValue());
+					long addition = ((long) amount) + liquid.getValue();
+					if(addition > Integer.MAX_VALUE) addition = Integer.MAX_VALUE;
+					allAvailableItems.put(liquid.getKey(), (int) addition);
 				}
 			}
 		}

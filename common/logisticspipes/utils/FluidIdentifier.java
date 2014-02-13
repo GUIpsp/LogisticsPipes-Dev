@@ -9,6 +9,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import logisticspipes.proxy.SimpleServiceLocator;
+import logisticspipes.utils.item.ItemIdentifier;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.ForgeDirection;
@@ -203,7 +204,8 @@ public class FluidIdentifier {
 	
 	@Override
 	public String toString() {
-		return name + "/" + fluidID + ":" + tag.toString();
+		String t = tag != null ? tag.toString() : "null";
+		return name + "/" + fluidID + ":" + t;
 	}
 	
 	public FluidIdentifier next() {

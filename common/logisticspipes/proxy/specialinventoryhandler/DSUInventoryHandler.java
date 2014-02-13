@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
 
-import logisticspipes.utils.ItemIdentifier;
+import logisticspipes.utils.item.ItemIdentifier;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.ForgeDirection;
@@ -136,11 +136,11 @@ public class DSUInventoryHandler extends SpecialInventoryHandler {
 		ItemStack items = _tile.getStoredItemType();
 		if((items == null || items.stackSize == 0)) {
 			if(stack.stackSize <= _tile.getMaxStoredCount()) {
-				_tile.setStoredItemType(stack.itemID, stack.getItemDamage(), stack.stackSize);
+				_tile.setStoredItemType(stack, stack.stackSize);
 				st.stackSize = stack.stackSize;
 				return st;
 			} else {
-				_tile.setStoredItemType(stack.itemID, stack.getItemDamage(), _tile.getMaxStoredCount());
+				_tile.setStoredItemType(stack, _tile.getMaxStoredCount());
 				st.stackSize = _tile.getMaxStoredCount();
 				return st;
 			}

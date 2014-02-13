@@ -3,8 +3,8 @@ package logisticspipes.gui.orderer;
 import logisticspipes.network.PacketHandler;
 import logisticspipes.network.packets.orderer.OrdererRefreshRequestPacket;
 import logisticspipes.proxy.MainProxy;
-import logisticspipes.utils.ItemIdentifier;
 import logisticspipes.utils.gui.SmallGuiButton;
+import logisticspipes.utils.item.ItemIdentifier;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.EntityPlayer;
 
@@ -49,7 +49,6 @@ public class NormalGuiOrderer extends GuiOrderer {
 				integer = 3;
 			}
 			integer += (dimension * 10);
-//TODO 		MainProxy.sendPacketToServer(new PacketPipeInteger(NetworkConstants.ORDERER_REFRESH_REQUEST,xCoord,yCoord,zCoord,integer).getPacket());
 			MainProxy.sendPacketToServer(PacketHandler.getPacket(OrdererRefreshRequestPacket.class).setInteger(integer).setPosX(xCoord).setPosY(yCoord).setPosZ(zCoord));
 	}
 

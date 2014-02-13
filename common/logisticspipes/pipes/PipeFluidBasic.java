@@ -14,7 +14,7 @@ import logisticspipes.textures.Textures.TextureType;
 import logisticspipes.transport.PipeFluidTransportLogistics;
 import logisticspipes.utils.FluidIdentifier;
 import logisticspipes.utils.PlayerCollectionList;
-import logisticspipes.utils.SimpleInventory;
+import logisticspipes.utils.item.ItemIdentifierInventory;
 import logisticspipes.utils.tuples.Pair;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -27,7 +27,7 @@ import net.minecraftforge.fluids.IFluidHandler;
 
 public class PipeFluidBasic extends FluidRoutedPipe implements IFluidSink {
 	
-	public SimpleInventory filterInv = new SimpleInventory(1, "Dummy", 1, true);
+	public ItemIdentifierInventory filterInv = new ItemIdentifierInventory(1, "Dummy", 1, true);
 	private PlayerCollectionList guiOpenedBy = new PlayerCollectionList();
 	
 	public PipeFluidBasic(int itemID) {

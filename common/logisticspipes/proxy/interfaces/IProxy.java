@@ -3,7 +3,7 @@ package logisticspipes.proxy.interfaces;
 import buildcraft.transport.Pipe;
 import logisticspipes.items.ItemLogisticsPipe;
 import logisticspipes.pipes.basic.LogisticsTileGenericPipe;
-import logisticspipes.utils.ItemIdentifier;
+import logisticspipes.utils.item.ItemIdentifier;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;

@@ -32,8 +32,8 @@ import logisticspipes.request.RequestTree;
 import logisticspipes.textures.Textures;
 import logisticspipes.textures.Textures.TextureType;
 import logisticspipes.utils.FluidIdentifier;
-import logisticspipes.utils.ItemIdentifierStack;
 import logisticspipes.utils.PlayerCollectionList;
+import logisticspipes.utils.item.ItemIdentifierStack;
 import logisticspipes.utils.tuples.Pair;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -98,7 +98,7 @@ public class PipeFluidSatellite extends FluidRoutedPipe implements IRequestFluid
 	private void addToList(ItemIdentifierStack stack) {
 		for(ItemIdentifierStack ident:itemList) {
 			if(ident.getItem().equals(stack.getItem())) {
-				ident.stackSize += stack.stackSize;
+				ident.setStackSize(ident.getStackSize() + stack.getStackSize());
 				return;
 			}
 		}
@@ -121,7 +121,6 @@ public class PipeFluidSatellite extends FluidRoutedPipe implements IRequestFluid
 		if(!itemList.equals(oldList) || force) {
 			oldList.clear();
 			oldList.addAll(itemList);
-//TODO 		MainProxy.sendToPlayerList(new PacketPipeInvContent(NetworkConstants.PIPE_CHEST_CONTENT, getX(), getY(), getZ(), itemList).getPacket(), localModeWatchers);
 			MainProxy.sendToPlayerList(PacketHandler.getPacket(ChestContent.class).setIdentList(itemList).setPosX(getX()).setPosY(getY()).setPosZ(getZ()), localModeWatchers);
 		}
 	}
@@ -140,13 +139,11 @@ public class PipeFluidSatellite extends FluidRoutedPipe implements IRequestFluid
 
 	@Override
 	public void startWatching() {
-//TODO 	MainProxy.sendPacketToServer(new PacketPipeInteger(NetworkConstants.HUD_START_WATCHING, getX(), getY(), getZ(), 1).getPacket());
 		MainProxy.sendPacketToServer(PacketHandler.getPacket(HUDStartWatchingPacket.class).setInteger(1).setPosX(getX()).setPosY(getY()).setPosZ(getZ()));
 	}
 
 	@Override
 	public void stopWatching() {
-//TODO 	MainProxy.sendPacketToServer(new PacketPipeInteger(NetworkConstants.HUD_STOP_WATCHING, getX(), getY(), getZ(), 1).getPacket());
 		MainProxy.sendPacketToServer(PacketHandler.getPacket(HUDStopWatchingPacket.class).setInteger(1).setPosX(getX()).setPosY(getY()).setPosZ(getZ()));
 	}
 	

@@ -20,10 +20,10 @@ import logisticspipes.textures.Textures.TextureType;
 import logisticspipes.transport.PipeTransportLogistics;
 import logisticspipes.utils.AdjacentTile;
 import logisticspipes.utils.FluidIdentifier;
-import logisticspipes.utils.ItemIdentifier;
-import logisticspipes.utils.ItemIdentifierStack;
-import logisticspipes.utils.SimpleInventory;
 import logisticspipes.utils.WorldUtil;
+import logisticspipes.utils.item.ItemIdentifier;
+import logisticspipes.utils.item.ItemIdentifierInventory;
+import logisticspipes.utils.item.ItemIdentifierStack;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -137,7 +137,7 @@ public class PipeItemsFluidSupplier extends CoreRoutedPipe implements IRequestIt
 		return true;
 	}
 // from PipeItemsFluidSupplier
-	private SimpleInventory dummyInventory = new SimpleInventory(9, "Fluids to keep stocked", 127);
+	private ItemIdentifierInventory dummyInventory = new ItemIdentifierInventory(9, "Fluids to keep stocked", 127);
 	
 	private final HashMap<ItemIdentifier, Integer> _requestedItems = new HashMap<ItemIdentifier, Integer>();
 	
@@ -255,7 +255,7 @@ public class PipeItemsFluidSupplier extends CoreRoutedPipe implements IRequestIt
     }
 	
 	private void decreaseRequested(ItemIdentifierStack item) {
-		int remaining = item.stackSize;
+		int remaining = item.getStackSize();
 		//see if we can get an exact match
 		Integer count = _requestedItems.get(item.getItem());
 		if (count != null) {
@@ -307,7 +307,7 @@ public class PipeItemsFluidSupplier extends CoreRoutedPipe implements IRequestIt
 	}
 	
 	/*** GUI ***/
-	public SimpleInventory getDummyInventory() {
+	public ItemIdentifierInventory getDummyInventory() {
 		return dummyInventory;
 	}
 }

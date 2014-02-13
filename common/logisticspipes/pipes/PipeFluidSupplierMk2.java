@@ -17,8 +17,8 @@ import logisticspipes.textures.Textures;
 import logisticspipes.textures.Textures.TextureType;
 import logisticspipes.utils.AdjacentTile;
 import logisticspipes.utils.FluidIdentifier;
-import logisticspipes.utils.SimpleInventory;
 import logisticspipes.utils.WorldUtil;
+import logisticspipes.utils.item.ItemIdentifierInventory;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.nbt.NBTTagCompound;
@@ -77,7 +77,7 @@ public class PipeFluidSupplierMk2 extends FluidRoutedPipe implements IRequestFlu
 	}
 	
 	//from PipeFluidSupplierMk2
-	private SimpleInventory dummyInventory = new SimpleInventory(1, "Fluid to keep stocked", 127, true);
+	private ItemIdentifierInventory dummyInventory = new ItemIdentifierInventory(1, "Fluid to keep stocked", 127, true);
 	private int amount = 0;
 	
 	private final Map<FluidIdentifier, Integer> _requestedItems = new HashMap<FluidIdentifier, Integer>();
@@ -257,7 +257,6 @@ public class PipeFluidSupplierMk2 extends FluidRoutedPipe implements IRequestFlu
 		if(amount <= 0) {
 			amount = 0;
 		}
-//TODO 	MainProxy.sendPacketToPlayer(new PacketPipeInteger(NetworkConstants.LIQUID_SUPPLIER_LIQUID_AMOUNT, xCoord, yCoord, zCoord, amount).getPacket(), (Player)player);
 		MainProxy.sendPacketToPlayer(PacketHandler.getPacket(FluidSupplierAmount.class).setInteger(amount).setPosX(getX()).setPosY(getY()).setPosZ(getZ()), (Player)player);
 	}
 }

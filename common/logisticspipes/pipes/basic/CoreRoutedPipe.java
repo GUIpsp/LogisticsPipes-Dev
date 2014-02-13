@@ -73,11 +73,11 @@ import logisticspipes.transport.PipeTransportLogistics;
 import logisticspipes.utils.AdjacentTile;
 import logisticspipes.utils.FluidIdentifier;
 import logisticspipes.utils.InventoryHelper;
-import logisticspipes.utils.ItemIdentifier;
-import logisticspipes.utils.ItemIdentifierStack;
 import logisticspipes.utils.OrientationsUtil;
 import logisticspipes.utils.PlayerCollectionList;
 import logisticspipes.utils.WorldUtil;
+import logisticspipes.utils.item.ItemIdentifier;
+import logisticspipes.utils.item.ItemIdentifierStack;
 import logisticspipes.utils.tuples.Pair;
 import logisticspipes.utils.tuples.Triplet;
 import net.minecraft.crash.CrashReportCategory;
@@ -1136,7 +1136,7 @@ outer:
 		for(Iterator<IRoutedItem> iter = _inTransitToMe.iterator();iter.hasNext();) {
 			IRoutedItem next = iter.next();
 			if(next.getIDStack().getItem() == it)
-				count += next.getIDStack().stackSize;
+				count += next.getIDStack().getStackSize();
 		}
 		return count;
 	}

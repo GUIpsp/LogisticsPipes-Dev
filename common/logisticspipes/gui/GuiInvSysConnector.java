@@ -13,11 +13,11 @@ import logisticspipes.network.packets.pipe.InvSysConContentRequest;
 import logisticspipes.network.packets.pipe.InvSysConResistance;
 import logisticspipes.pipes.PipeItemsInvSysConnector;
 import logisticspipes.proxy.MainProxy;
-import logisticspipes.utils.ItemIdentifierStack;
 import logisticspipes.utils.gui.BasicGuiHelper;
 import logisticspipes.utils.gui.DummyContainer;
 import logisticspipes.utils.gui.KraphtBaseGuiScreen;
 import logisticspipes.utils.gui.SmallGuiButton;
+import logisticspipes.utils.item.ItemIdentifierStack;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -165,7 +165,6 @@ public class GuiInvSysConnector extends KraphtBaseGuiScreen {
 			}
 		} else if(button.id == 5) {
 			pipe.resistance = localresistance;
-//TODO 		MainProxy.sendPacketToServer(new PacketPipeInteger(NetworkConstants.INC_SYS_CON_RESISTANCE, pipe.getX(), pipe.getY(), pipe.getZ(), pipe.resistance).getPacket());
 			MainProxy.sendPacketToServer(PacketHandler.getPacket(InvSysConResistance.class).setInteger(pipe.resistance).setPosX(pipe.getX()).setPosY(pipe.getY()).setPosZ(pipe.getZ()));
 		}
 	}

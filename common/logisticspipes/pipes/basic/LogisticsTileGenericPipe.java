@@ -28,7 +28,6 @@ import logisticspipes.utils.OrientationsUtil;
 import logisticspipes.utils.WorldUtil;
 import net.minecraft.block.Block;
 import net.minecraft.crash.CrashReportCategory;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
@@ -60,12 +59,13 @@ import buildcraft.transport.PipeTransportItems;
 import buildcraft.transport.TravelingItem;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import cofh.api.transport.IItemConduit;
 import dan200.computer.api.IComputerAccess;
 import dan200.computer.api.ILuaContext;
 import dan200.computer.api.IPeripheral;
 
-@ModDependentInterface(modId={"ComputerCraft", "BuildCraft|Core", "BuildCraft|Transport"}, interfacePath={"dan200.computer.api.IPeripheral", "buildcraft.api.power.IPowerReceptor", "buildcraft.api.transport.IPipeTile"})
-public class LogisticsTileGenericPipe extends TileEntity implements IPeripheral, IPowerReceptor, IFluidHandler, IPipeTile {
+@ModDependentInterface(modId={"ComputerCraft", "BuildCraft|Core", "BuildCraft|Transport", "CoFHCore"}, interfacePath={"dan200.computer.api.IPeripheral", "buildcraft.api.power.IPowerReceptor", "buildcraft.api.transport.IPipeTile", "cofh.api.transport.IItemConduit"})
+public class LogisticsTileGenericPipe extends TileEntity implements IPeripheral, IPowerReceptor, IFluidHandler, IPipeTile, IItemConduit {
 
 	public boolean turtleConnect[] = new boolean[7];
 	
@@ -641,6 +641,30 @@ public class LogisticsTileGenericPipe extends TileEntity implements IPeripheral,
 
 	public int getLastCCID() {
 		return SimpleServiceLocator.ccProxy.getLastCCID(this);
+	}
+
+	// To remove IF TE supports BC pipes natively.
+	@Override
+	@Deprecated
+	@ModDependentMethod(modId="CoFHCore")
+	public ItemStack sendItems(ItemStack stack, ForgeDirection dir) {
+		return insertItem(dir, stack);
+	}
+
+	@Override
+	public ItemStack insertItem(ForgeDirection dir, ItemStack stack) {
+		return insertItem(dir, stack, false);
+	}
+
+	@Override
+	@Deprecated
+	@ModDependentMethod(modId="CoFHCore")
+	public ItemStack insertItem(ForgeDirection dir, ItemStack stack, boolean simulate) {
+		if(this.injectItem(stack, !simulate, dir) == stack.stackSize) {
+			return null;
+		} else {
+			return stack;
+		}
 	}
 	
 	private boolean deletePipe = false;

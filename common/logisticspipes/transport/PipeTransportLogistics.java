@@ -8,6 +8,8 @@
 
 package logisticspipes.transport;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,7 +36,6 @@ import logisticspipes.interfaces.IItemAdvancedExistance;
 import logisticspipes.interfaces.ISpecialInsertion;
 import logisticspipes.logisticspipes.IRoutedItem;
 import logisticspipes.pipefxhandlers.Particles;
-import logisticspipes.pipes.PipeBlockRequestTable;
 import logisticspipes.pipes.PipeItemsSupplierLogistics;
 import logisticspipes.pipes.basic.CoreRoutedPipe;
 import logisticspipes.pipes.basic.LogisticsTileGenericPipe;
@@ -43,8 +44,8 @@ import logisticspipes.proxy.MainProxy;
 import logisticspipes.proxy.SimpleServiceLocator;
 import logisticspipes.routing.RoutedEntityItem;
 import logisticspipes.utils.InventoryHelper;
-import logisticspipes.utils.ItemIdentifierStack;
 import logisticspipes.utils.SidedInventoryMinecraftAdapter;
+import logisticspipes.utils.item.ItemIdentifierStack;
 import logisticspipes.utils.tuples.Pair;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -78,6 +79,7 @@ import buildcraft.transport.Pipe;
 import buildcraft.transport.PipeTransportItems;
 import buildcraft.transport.TileGenericPipe;
 import buildcraft.transport.TransportConstants;
+import buildcraft.transport.TravelerSet;
 import buildcraft.transport.TravelingItem;
 import buildcraft.transport.PipeTransportItems.TravelerSet;
 import buildcraft.transport.network.PacketPipeTransportContent;
@@ -90,6 +92,8 @@ public class PipeTransportLogistics {
 	private final int _bufferTimeOut = 20 * 2; //2 Seconds
 	private final HashMap<ItemStack,Pair<Integer /* Time */, Integer /* BufferCounter */>> _itemBuffer = new HashMap<ItemStack, Pair<Integer, Integer>>(); 
 
+	private static Field toLoad;
+	
 	public PipeTransportLogistics() {
 		allowBouncing = true;
 	}
@@ -131,23 +135,31 @@ public class PipeTransportLogistics {
 			iterator.remove();
 		}
 	}
-	
+
+	@Override
+	public void injectItem(TravelingItem item, ForgeDirection inputOrientation) {
+		super.injectItem(SimpleServiceLocator.buildCraftProxy.GetOrCreateRoutedItem(item), inputOrientation);
+	}
+
+	@Override
+	protected void reverseItem(TravelingItem item) {
+		super.reverseItem(SimpleServiceLocator.buildCraftProxy.GetOrCreateRoutedItem(item));
+	}
+
 	@Override
 	public ForgeDirection resolveDestination(TravelingItem data) {
 		
 		if(data != null && data.getItemStack() != null) {
 			getPipe().relayedItem(data.getItemStack().stackSize);
-		if(this.container.pipe instanceof PipeBlockRequestTable) {
-			System.out.print("");
-		}
 		}
 		
 		ForgeDirection blocked = null;
+
+		IRoutedItem routedItem = SimpleServiceLocator.buildCraftProxy.GetRoutedItem(data);
 		
-		if(!(data instanceof IRoutedItem) && data != null) {
+		if(routedItem.getDestinationUUID() == null) {
 			TravelingItem result = getPipe().getQueuedForItemStack(data.getItemStack());
 			if(result != null) {
-				IRoutedItem routedItem = SimpleServiceLocator.buildCraftProxy.GetOrCreateRoutedItem(data);
 				if(routedItem instanceof RoutedEntityItem && result instanceof RoutedEntityItem) {
 					((RoutedEntityItem)routedItem).useInformationFrom((RoutedEntityItem)result);
 					blocked = data.input.getOpposite();
@@ -157,7 +169,6 @@ public class PipeTransportLogistics {
 			}
 		}
 		
-		IRoutedItem routedItem = SimpleServiceLocator.buildCraftProxy.GetOrCreateRoutedItem(data);
 		ForgeDirection value;
 		value = getPipe().getRouteLayer().getOrientationForItem(routedItem, blocked);
 		if (value == null && MainProxy.isClient(getWorld())) {
@@ -183,8 +194,6 @@ public class PipeTransportLogistics {
 			}
 		}
 		
-		readjustSpeed(routedItem.getTravelingItem());
-		
 		return value;
 	}
 	
@@ -200,6 +209,7 @@ public class PipeTransportLogistics {
             NBTTagCompound nbttagcompound1 = (NBTTagCompound)nbttaglist.tagAt(i);
             _itemBuffer.put(ItemStack.loadItemStackFromNBT(nbttagcompound1), new Pair<Integer, Integer>(_bufferTimeOut, 0));
         }
+        
 	}
 	
 	@Override
@@ -226,17 +236,19 @@ public class PipeTransportLogistics {
 			
 			switch (routedItem.getTransportMode()){
 			case Default:
-				defaultBoost = 10F;
+				defaultBoost = 20F;
 				break;
 			case Passive:
-				defaultBoost = 20F;
+				defaultBoost = 25F;
 				break;
 			case Active:
 				defaultBoost = 30F;
 				break;
 			case Unknown:
+				defaultBoost = 20F;
 				break;
 			default:
+				defaultBoost = 20F;
 				break;
 			
 			}
@@ -245,7 +257,7 @@ public class PipeTransportLogistics {
 			float multiplyerPower = 1.0F + (0.3F * getPipe().getUpgradeManager().getSpeedUpgradeCount());
 			
 			float add = Math.max(item.getSpeed(), TransportConstants.PIPE_NORMAL_SPEED * defaultBoost * multiplyerPower) - item.getSpeed();
-			if(getPipe().useEnergy((int)(add * 25+0.5))) {
+			if(getPipe().useEnergy((int)(add * 50 + 0.5))) {
 				item.setSpeed(Math.min(Math.max(item.getSpeed(), TransportConstants.PIPE_NORMAL_SPEED * defaultBoost * multiplyerSpeed), 1.0F));
 			}
 		}
@@ -389,7 +401,9 @@ public class PipeTransportLogistics {
 	
 	@Override
 	public boolean canPipeConnect(TileEntity tile, ForgeDirection side) {
-		return super.canPipeConnect(tile, side) || SimpleServiceLocator.betterStorageProxy.isBetterStorageCrate(tile);
+		return super.canPipeConnect(tile, side)
+				|| SimpleServiceLocator.betterStorageProxy.isBetterStorageCrate(tile)
+				|| SimpleServiceLocator.factorizationProxy.isBarral(tile);
 	}
 
 	/* --- IItemTravelHook --- */

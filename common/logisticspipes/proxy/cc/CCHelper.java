@@ -7,8 +7,8 @@ import java.util.Map;
 
 import logisticspipes.proxy.cc.interfaces.CCCommand;
 import logisticspipes.proxy.cc.interfaces.CCType;
-import logisticspipes.utils.ItemIdentifier;
-import logisticspipes.utils.ItemIdentifierStack;
+import logisticspipes.utils.item.ItemIdentifier;
+import logisticspipes.utils.item.ItemIdentifierStack;
 import logisticspipes.utils.tuples.Pair;
 import logisticspipes.utils.tuples.Quartet;
 import logisticspipes.utils.tuples.Triplet;
@@ -63,7 +63,7 @@ public class CCHelper {
 			ItemIdentifierStack mes = (ItemIdentifierStack) input;
 			Map map = new HashMap();
 			map.put(1,getAnswer(mes.getItem()));
-			map.put(2,getAnswer(mes.stackSize));
+			map.put(2,getAnswer(mes.getStackSize()));
 			return map;
 		}
 		return checkForAnnotations(input);

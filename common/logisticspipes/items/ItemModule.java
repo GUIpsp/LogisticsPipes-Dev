@@ -35,8 +35,8 @@ import logisticspipes.modules.ModuleTerminus;
 import logisticspipes.modules.ModuleThaumicAspectSink;
 import logisticspipes.pipes.basic.LogisticsTileGenericPipe;
 import logisticspipes.proxy.MainProxy;
-import logisticspipes.utils.ItemIdentifierStack;
-import logisticspipes.utils.SimpleInventory;
+import logisticspipes.utils.item.ItemIdentifierInventory;
+import logisticspipes.utils.item.ItemIdentifierStack;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -333,13 +333,13 @@ public class ItemModule extends LogisticsItem {
 								if(module.hasKey(prefix + "itemsCount")) {
 									size = module.getInteger(prefix + "itemsCount");
 								}
-								SimpleInventory inv = new SimpleInventory(size, "InformationTempInventory", Integer.MAX_VALUE);
+								ItemIdentifierInventory inv = new ItemIdentifierInventory(size, "InformationTempInventory", Integer.MAX_VALUE);
 								inv.readFromNBT(module, prefix);
 								for(int pos=0;pos < inv.getSizeInventory();pos++) {
 									ItemIdentifierStack stack = inv.getIDStackInSlot(pos);
 									if(stack != null) {
-										if(stack.stackSize > 1) {
-											list.add("  " + stack.stackSize+"x " + stack.getFriendlyName());
+										if(stack.getStackSize() > 1) {
+											list.add("  " + stack.getStackSize()+"x " + stack.getFriendlyName());
 										} else {
 											list.add("  " + stack.getFriendlyName());
 										}

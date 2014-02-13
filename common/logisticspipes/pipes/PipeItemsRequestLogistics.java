@@ -32,7 +32,7 @@ import logisticspipes.request.RequestTree;
 import logisticspipes.security.SecuritySettings;
 import logisticspipes.textures.Textures;
 import logisticspipes.textures.Textures.TextureType;
-import logisticspipes.utils.ItemIdentifier;
+import logisticspipes.utils.item.ItemIdentifier;
 import logisticspipes.utils.tuples.Pair;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -199,6 +199,7 @@ public class PipeItemsRequestLogistics extends CoreRoutedPipe implements IReques
 	public Object[] makeRequest(Double itemId, Double amount) throws Exception {
 		return makeRequest(itemId, amount, false);
 	}
+
 	@CCCommand(description="Requests the given ItemIdentifier Id with the given amount")
 	@CCQueued
 	public Object[] makeRequest(Double itemId, Double amount, Boolean forceCrafting) throws Exception {
@@ -226,5 +227,17 @@ public class PipeItemsRequestLogistics extends CoreRoutedPipe implements IReques
 	public List<ItemIdentifier> getCraftableItems() {
 		LinkedList<ItemIdentifier> items = SimpleServiceLocator.logisticsManager.getCraftableItems(getRouter().getIRoutersByCost());
 		return items;
+	}
+
+	@CCCommand(description="Asks for the amount of an ItemIdentifier Id inside the Logistics Network")
+	@CCQueued
+	public int getItemAmount(Double itemId) throws Exception {
+		Map<ItemIdentifier, Integer> items = SimpleServiceLocator.logisticsManager.getAvailableItems(getRouter().getIRoutersByCost());
+		ItemIdentifier item = ItemIdentifier.getForId((int)Math.floor(itemId));
+		if(item == null) throw new Exception("Invalid ItemIdentifierID");
+		if(items.containsKey(item)) {
+			return items.get(item);
+		}
+		return 0;
 	}
 }

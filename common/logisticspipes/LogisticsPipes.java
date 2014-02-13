@@ -9,6 +9,7 @@
 package logisticspipes;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.Calendar;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -42,6 +43,7 @@ import logisticspipes.proxy.MainProxy;
 import logisticspipes.proxy.ProxyManager;
 import logisticspipes.proxy.SimpleServiceLocator;
 import logisticspipes.proxy.SpecialInventoryHandlerManager;
+import logisticspipes.proxy.SpecialTankHandlerManager;
 import logisticspipes.proxy.buildcraft.BuildCraftProxy;
 import logisticspipes.proxy.recipeproviders.AssemblyAdvancedWorkbench;
 import logisticspipes.proxy.recipeproviders.AssemblyTable;
@@ -54,7 +56,6 @@ import logisticspipes.proxy.specialconnection.SpecialPipeConnection;
 import logisticspipes.proxy.specialconnection.SpecialTileConnection;
 import logisticspipes.proxy.specialconnection.TeleportPipes;
 import logisticspipes.proxy.specialconnection.TesseractConnection;
-import logisticspipes.proxy.specialtankhandler.BuildCraftTankHandler;
 import logisticspipes.proxy.specialtankhandler.SpecialTankHandler;
 import logisticspipes.recipes.CraftingPermissionManager;
 import logisticspipes.recipes.RecipeManager;
@@ -228,6 +229,21 @@ public class LogisticsPipes {
 	
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
+		String BCVersion = null;
+		try {
+			Field versionField = buildcraft.core.Version.class.getDeclaredField("VERSION");
+			BCVersion = (String) versionField.get(null);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		String expectedBCVersion = "4.2.2";
+		if(BCVersion != null) {
+			if(!BCVersion.equals("@VERSION@") && !BCVersion.contains(expectedBCVersion)) {
+				throw new RuntimeException("The BC Version '" + BCVersion + "' is not supported by this LP version. Please use '" + expectedBCVersion + "'");
+			}
+		} else {
+			log.info("Couldn't check the BC Version.");
+		}
 		
 		RouterManager manager = new RouterManager();
 		SimpleServiceLocator.setRouterManager(manager);
@@ -321,10 +337,10 @@ public class LogisticsPipes {
 		
 		ProxyManager.load();
 		SpecialInventoryHandlerManager.load();
+		SpecialTankHandlerManager.load();
 
 		SimpleServiceLocator.specialpipeconnection.registerHandler(new TeleportPipes());
 		SimpleServiceLocator.specialtileconnection.registerHandler(new TesseractConnection());
-		SimpleServiceLocator.specialTankHandler.registerHandler(new BuildCraftTankHandler());
 		
 		Object renderer = null;
 		if(isClient) {
